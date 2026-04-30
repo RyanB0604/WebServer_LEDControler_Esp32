@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"name": "WebHostingEsp32 v1.0",
+			"path": "../WebHostingEsp32 v1.0"
+		}
+	],
+	"settings": {}
+}

@@ -23,9 +23,9 @@ void turnAllOff()
   digitalWrite(greenLED, LOW);
   digitalWrite(yellowLED, LOW);
   digitalWrite(redLED, LOW);
-  bool greenLEDState = false;
-  bool yellowLEDState = false;
-  bool redLEDState = false;
+  greenLEDState = false;
+  yellowLEDState = false;
+  redLEDState = false;
 };
 
 // Create an AsyncWebServer object on port 80
@@ -165,9 +165,9 @@ void loop()
         digitalWrite(redLED, HIGH);
         digitalWrite(yellowLED, HIGH);
         digitalWrite(greenLED, LOW);
-        bool redLEDState = true;
-        bool yellowLEDState = true;
-        bool greenLEDState = false;
+        redLEDState = true;
+        yellowLEDState = true;
+        greenLEDState = false;
         xmasStep = 1;
       }
       else if (xmasStep == 1)
@@ -175,9 +175,9 @@ void loop()
         digitalWrite(redLED, LOW);
         digitalWrite(yellowLED, HIGH);
         digitalWrite(greenLED, HIGH);
-        bool redLEDState = false;
-        bool yellowLEDState = true;
-        bool greenLEDState = true;
+        redLEDState = false;
+        yellowLEDState = true;
+        greenLEDState = true;
         xmasStep = 2;
       }
       else if (xmasStep == 2)
@@ -185,9 +185,9 @@ void loop()
         digitalWrite(redLED, HIGH);
         digitalWrite(yellowLED, LOW);
         digitalWrite(greenLED, HIGH);
-        bool redLEDState = true;
-        bool yellowLEDState = false;
-        bool greenLEDState = true;
+        redLEDState = true;
+        yellowLEDState = false;
+        greenLEDState = true;
         xmasStep = 0;
       }
     }

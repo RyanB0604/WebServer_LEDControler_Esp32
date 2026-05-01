@@ -3,6 +3,17 @@
 #include <ESPAsyncWebServer.h> //This is to host the site
 #include <LittleFS.h>          // This is to manage files, now interacting with data file
 
+// Screen Libraries
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define OLED_RESET -1    // Reset pin # -- I dont have one so we tell the system to not look for one
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
 const char *ssid = "Tell my WiFi love her";
 const char *password = "8008135!";
 
@@ -28,6 +39,40 @@ void turnAllOff()
   redLEDState = false;
 };
 
+void updateDisplay()
+{
+  display.clearDisplay(); // removes prev frame
+
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE); // Draw white text
+
+  // 1. Print the IP Address at the top
+  display.setCursor(0, 0);
+  display.print("IP: ");
+  display.println(WiFi.localIP());
+  display.drawLine(0, 10, 128, 10, SSD1306_WHITE); // Draw a nice line under the IP
+
+  // 2. Print the LED Statuses
+  display.setCursor(0, 15);
+  display.print("Green:  ");
+  display.println(greenLEDState ? "ON" : "OFF"); // Shorthand if/else statement!
+
+  display.print("Yellow: ");
+  display.println(yellowLEDState ? "ON" : "OFF");
+
+  display.print("Red:    ");
+  display.println(redLEDState ? "ON" : "OFF");
+
+  display.print("Xmas:   ");
+  display.println(xmasState ? "ACTIVE" : "OFF");
+
+  // 3. Push it to the physical screen!
+  display.display();
+}
+
 // Create an AsyncWebServer object on port 80
 AsyncWebServer server(80); // Port 80 is standard for HTTP unencrypted websites
 
@@ -43,7 +88,22 @@ void setup()
 
   Serial.begin(115200);
 
-  //
+  //////////////////////////////////////////////////////////////////
+  // Initialize the OLED display with I2C address 0x3C
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;); // Don't proceed, loop forever
+  }
+  
+  // Show a "Booting" message while Wi-Fi connects
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 20);
+  display.println("Connecting to WiFi...");
+  display.display();
+  ////////////////////////////////
+
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED)
@@ -54,6 +114,8 @@ void setup()
   Serial.println("");
   Serial.print("Connected! IP Address: ");
   Serial.println(WiFi.localIP());
+
+  updateDisplay();
 
   if (!LittleFS.begin())
   {
@@ -79,6 +141,7 @@ void setup()
 
                 // Print to the Serial Monitor to verify it worked
                 Serial.println("\n=============\nGREEN TOGGLED!\n=============\n");
+                updateDisplay();
 
                 // 4. The Receipt: Tell the browser "Message received, status 200 OK"
                 // If you forget this, your webpage will freeze up!
@@ -100,6 +163,7 @@ void setup()
 
 // Print to the Serial Monitor to verify it worked     
                 Serial.println("\n=============\nYELLOW TOGGLED!\n=============\n");
+                updateDisplay();
 
                 request->send(200, "text/plain", "Success"); });
 
@@ -118,6 +182,7 @@ void setup()
 
                 // Print to the Serial Monitor to verify it worked
                 Serial.println("\n=============\nRED TOGGLED!\n=============\n");
+                updateDisplay();
             
                 request->send(200, "text/plain", "Success"); });
 
@@ -140,6 +205,7 @@ void setup()
 
                 // Print to the Serial Monitor to verify it worked
                 Serial.println("\n=============\nXMAS TOGGLED!\n=============\n");
+                updateDisplay();
             
                 request->send(200, "text/plain", "Success"); });
 
@@ -190,6 +256,7 @@ void loop()
         greenLEDState = true;
         xmasStep = 0;
       }
+      updateDisplay();
     }
   }
 }
